@@ -7,7 +7,7 @@ int front = 0;  //front of queue. 큐의 머리
 int rear = 0;   //rear of queue. 큐의 꼬리
 char *queue[MAX] = {"-1", "-1", "-1", "-1", "-1", "-1", "-1", "-1", "-1", "-1"};  //-1 in queue means empty. declare pointer array for putting string into queue. 문자열을 넣기 위해 포인터 배열로 선언
 
-void Add();
+int Add();
 void pop();
 void display();
 
@@ -18,6 +18,7 @@ int main(void){
     while(1){
             int input = 0;
             int add = 0;
+            int add_result;
             printf("This is Queue program. -1 means the queue is empty.\n");
             printf("1.add\t2.pop\t3.display\t4.quit\n");
             printf("\t*add : Add the number which you type into the Queue\n");
@@ -29,7 +30,9 @@ int main(void){
             printf("=========================================================================================\n");
             switch(input){
                 case 1:
-                    Add();
+                    do{
+                        add_result = Add();
+                    }while(add_result==1);  //사이즈에 안 맞는 범위를 입력하면 반복문 실행
                     break;
                 case 2:
                     pop();
@@ -47,31 +50,39 @@ int main(void){
     }
 }
 
-void Add(){
+int Add(){
     int size;
-    char *add;
+    //char *add;
 
-    printf(">>>>>type the size of string you will enter : ");
-    scanf("%d", &size); 
-    //while(getchar()!='\n');
-    add = malloc(sizeof(char)*size);   //char *add = malloc(sizeof(char)*size)
-    
-    printf(">>>>>Please type the number which you want to input to Queue : ");
-    scanf("%s", add);
+        printf(">>>>>type the size of string you will enter : ");
+        scanf("%d", &size); 
+        printf("Input size : %d\n", size);
 
-    if(strcmp(queue[rear], "-1") != 0){     //when queue is full. rear가 가리키는 곳이 -1이 아니면 내용물이 있는 것.
-        printf(">>>>>Queue is full.\n");
-        free(add);
-    }
-    else{
-        queue[rear] = add;    
-        rear+=1;
-        if(rear == MAX) rear = rear % MAX;  //if rear is over the end of array index, go back to the front of array.
-                                            //원형큐를 만들기 위한 조건. rear가 배열크기가 됐을 때 배열 처음으로 돌려줌.
-        printf(">>>>>%s is added in Queue.\n", add);
-        free(add);
-    }
-    
+        char *add = malloc(sizeof(char)*size+1);   
+        
+        printf(">>>>>Please type the number which you want to input to Queue : ");
+        scanf("%s", add);
+
+        if(strlen(add) != (sizeof(char)*size+1)) {  //입력한 사이즈를 벗어나는 숫자를 입력했을 때
+            printf("Please type the valid size of value\n");
+            //free(add);
+            return 1;
+        } else{
+
+            if(strcmp(queue[rear], "-1") != 0){     //when queue is full. rear가 가리키는 곳이 -1이 아니면 내용물이 있는 것.
+            printf(">>>>>Queue is full.\n");
+            return 0;
+            //free(add);
+            } else{
+                queue[rear] = add;    
+                rear+=1;
+                if(rear == MAX) rear = rear % MAX;  //if rear is over the end of array index, go back to the front of array.
+                                                    //원형큐를 만들기 위한 조건. rear가 배열크기가 됐을 때 배열 처음으로 돌려줌.
+                printf(">>>>>%s is added in Queue.\n", add);
+                return 0;
+                //free(add);
+            }
+        }
 }
 
 void pop(){
@@ -79,8 +90,8 @@ void pop(){
         printf(">>>>>Queue is empty.\n");
     }
     else {
-        if(rear == MAX){    //when rear is bigger than MAX. 원형큐 만들기 위한 조건.
-            rear = rear % MAX;
+        if(rear == MAX){    //when rear is bigger than MAX. 
+            rear = rear % MAX;  //원형큐 만들기 위한 조건.
         }
         printf("%s is poped!\n", queue[front]);
         queue[front] = "-1";
